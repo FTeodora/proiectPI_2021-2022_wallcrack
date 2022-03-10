@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "common.h"
 
-
+#define THRESH 127
 void testOpenImage()
 {
 	char fname[MAX_PATH];
@@ -16,7 +16,26 @@ void testOpenImage()
 		waitKey();
 	}
 }
-
+void testThresholding() {
+	char fname[MAX_PATH];
+	if (openFileDlg(fname))
+	{
+		Mat src;
+		src = imread(fname,IMREAD_GRAYSCALE);
+		Mat th2= Mat(src.rows, src.cols, CV_8UC1);
+		Mat th3= Mat(src.rows, src.cols, CV_8UC1);
+		Mat th4= Mat(src.rows, src.cols, CV_8UC1);
+		double C=0.0f;
+		adaptiveThreshold(src, th2,255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 2);
+		adaptiveThreshold(src, th3,255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 7);
+		adaptiveThreshold(src, th4,255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 12);
+		
+		imshow("ResultC=2", th2);
+		imshow("ResultC=7", th3);
+		imshow("ResultC=12", th4);
+		waitKey();
+	}
+}
 void testOpenImagesFld()
 {
 	char folderName[MAX_PATH];
@@ -421,56 +440,12 @@ void showHistogram(const std::string& name, int* hist, const int  hist_cols, con
 
 int main()
 {
-	int op;
-	do
-	{
+	while (true) {
 		system("cls");
 		destroyAllWindows();
-		printf("Menu:\n");
-		printf(" 1 - Open image\n");
-		printf(" 2 - Open BMP images from folder\n");
-		printf(" 3 - Image negative - diblook style\n");
-		printf(" 4 - BGR->HSV\n");
-		printf(" 5 - Resize image\n");
-		printf(" 6 - Canny edge detection\n");
-		printf(" 7 - Edges in a video sequence\n");
-		printf(" 8 - Snap frame from live video\n");
-		printf(" 9 - Mouse callback demo\n");
-		printf(" 0 - Exit\n\n");
-		printf("Option: ");
-		scanf("%d",&op);
-		switch (op)
-		{
-			case 1:
-				testOpenImage();
-				break;
-			case 2:
-				testOpenImagesFld();
-				break;
-			case 3:
-				testParcurgereSimplaDiblookStyle(); //diblook style
-				break;
-			case 4:
-				//testColor2Gray();
-				testBGR2HSV();
-				break;
-			case 5:
-				testResize();
-				break;
-			case 6:
-				testCanny();
-				break;
-			case 7:
-				testVideoSequence();
-				break;
-			case 8:
-				testSnap();
-				break;
-			case 9:
-				testMouseClick();
-				break;
-		}
+		testThresholding();
+		waitKey();
 	}
-	while (op!=0);
+		
 	return 0;
 }
