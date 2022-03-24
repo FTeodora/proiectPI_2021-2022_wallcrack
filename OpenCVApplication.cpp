@@ -4,15 +4,22 @@
 #include "stdafx.h"
 #include "common.h"
 
+#include "func.h"
+
+
 #define THRESH 127
+#define THINNESS_THRESH 0.3
+#define AREA_THRESH 25000
+
+
 void testOpenImage()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		Mat src;
 		src = imread(fname);
-		imshow("image",src);
+		imshow("image", src);
 		waitKey();
 	}
 }
@@ -21,34 +28,59 @@ void testThresholding() {
 	if (openFileDlg(fname))
 	{
 		Mat src;
-		src = imread(fname,IMREAD_GRAYSCALE);
-		Mat th2= Mat(src.rows, src.cols, CV_8UC1);
-		Mat th3= Mat(src.rows, src.cols, CV_8UC1);
-		Mat th4= Mat(src.rows, src.cols, CV_8UC1);
-		double C=0.0f;
-		adaptiveThreshold(src, th2,255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 2);
-		adaptiveThreshold(src, th3,255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 7);
-		adaptiveThreshold(src, th4,255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 12);
-		
+		src = imread(fname, IMREAD_GRAYSCALE);
+		Mat th2 = Mat(src.rows, src.cols, CV_8UC1);
+		Mat th3 = Mat(src.rows, src.cols, CV_8UC1);
+		Mat th4 = Mat(src.rows, src.cols, CV_8UC1);
+		double C = 0.0f;
+		adaptiveThreshold(src, th2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 2);
+		adaptiveThreshold(src, th3, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 7);
+		adaptiveThreshold(src, th4, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 12);
+
 		imshow("ResultC=2", th2);
 		imshow("ResultC=7", th3);
 		imshow("ResultC=12", th4);
 		waitKey();
 	}
 }
+
+Mat getBinary() {
+	char fname[MAX_PATH];
+	if (openFileDlg(fname))
+	{
+		Mat src;
+		src = imread(fname, IMREAD_GRAYSCALE);
+		Mat th2 = Mat(src.rows, src.cols, CV_8UC1);
+		Mat th3 = Mat(src.rows, src.cols, CV_8UC1);
+		Mat th4 = Mat(src.rows, src.cols, CV_8UC1);
+		double C = 0.0f;
+		adaptiveThreshold(src, th2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 15);
+		adaptiveThreshold(src, th3, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 7);
+		adaptiveThreshold(src, th4, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 12);
+
+		/*
+		imshow("ResultC=2", th2);
+		imshow("ResultC=7", th3);
+		imshow("ResultC=12", th4);
+		waitKey();*/
+
+		return th4;
+	}
+
+}
 void testOpenImagesFld()
 {
 	char folderName[MAX_PATH];
-	if (openFolderDlg(folderName)==0)
+	if (openFolderDlg(folderName) == 0)
 		return;
 	char fname[MAX_PATH];
-	FileGetter fg(folderName,"bmp");
-	while(fg.getNextAbsFile(fname))
+	FileGetter fg(folderName, "bmp");
+	while (fg.getNextAbsFile(fname))
 	{
 		Mat src;
 		src = imread(fname);
-		imshow(fg.getFoundFileName(),src);
-		if (waitKey()==27) //ESC pressed
+		imshow(fg.getFoundFileName(), src);
+		if (waitKey() == 27) //ESC pressed
 			break;
 	}
 }
@@ -91,23 +123,23 @@ void testImageOpenAndSave()
 void testNegativeImage()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		double t = (double)getTickCount(); // Get the current time [s]
-		
-		Mat src = imread(fname,CV_LOAD_IMAGE_GRAYSCALE);
+
+		Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
 		int height = src.rows;
 		int width = src.cols;
-		Mat dst = Mat(height,width,CV_8UC1);
+		Mat dst = Mat(height, width, CV_8UC1);
 		// Asa se acceseaaza pixelii individuali pt. o imagine cu 8 biti/pixel
 		// Varianta ineficienta (lenta)
-		for (int i=0; i<height; i++)
+		for (int i = 0; i < height; i++)
 		{
-			for (int j=0; j<width; j++)
+			for (int j = 0; j < width; j++)
 			{
-				uchar val = src.at<uchar>(i,j);
+				uchar val = src.at<uchar>(i, j);
 				uchar neg = 255 - val;
-				dst.at<uchar>(i,j) = neg;
+				dst.at<uchar>(i, j) = neg;
 			}
 		}
 
@@ -116,8 +148,8 @@ void testNegativeImage()
 		// Print (in the console window) the processing time in [ms] 
 		printf("Time = %.3f [ms]\n", t * 1000);
 
-		imshow("input image",src);
-		imshow("negative image",dst);
+		imshow("input image", src);
+		imshow("negative image", dst);
 		waitKey();
 	}
 }
@@ -135,13 +167,13 @@ void testParcurgereSimplaDiblookStyle()
 		double t = (double)getTickCount(); // Get the current time [s]
 
 		// the fastest approach using the “diblook style”
-		uchar *lpSrc = src.data;
-		uchar *lpDst = dst.data;
-		int w = (int) src.step; // no dword alignment is done !!!
-		for (int i = 0; i<height; i++)
+		uchar* lpSrc = src.data;
+		uchar* lpDst = dst.data;
+		int w = (int)src.step; // no dword alignment is done !!!
+		for (int i = 0; i < height; i++)
 			for (int j = 0; j < width; j++) {
-				uchar val = lpSrc[i*w + j];
-				lpDst[i*w + j] = 255 - val;
+				uchar val = lpSrc[i * w + j];
+				lpDst[i * w + j] = 255 - val;
 			}
 
 		// Get the current time again and compute the time difference [s]
@@ -149,8 +181,8 @@ void testParcurgereSimplaDiblookStyle()
 		// Print (in the console window) the processing time in [ms] 
 		printf("Time = %.3f [ms]\n", t * 1000);
 
-		imshow("input image",src);
-		imshow("negative image",dst);
+		imshow("input image", src);
+		imshow("negative image", dst);
 		waitKey();
 	}
 }
@@ -158,31 +190,31 @@ void testParcurgereSimplaDiblookStyle()
 void testColor2Gray()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		Mat src = imread(fname);
 
 		int height = src.rows;
 		int width = src.cols;
 
-		Mat dst = Mat(height,width,CV_8UC1);
+		Mat dst = Mat(height, width, CV_8UC1);
 
 		// Asa se acceseaaza pixelii individuali pt. o imagine RGB 24 biti/pixel
 		// Varianta ineficienta (lenta)
-		for (int i=0; i<height; i++)
+		for (int i = 0; i < height; i++)
 		{
-			for (int j=0; j<width; j++)
+			for (int j = 0; j < width; j++)
 			{
-				Vec3b v3 = src.at<Vec3b>(i,j);
+				Vec3b v3 = src.at<Vec3b>(i, j);
 				uchar b = v3[0];
 				uchar g = v3[1];
 				uchar r = v3[2];
-				dst.at<uchar>(i,j) = (r+g+b)/3;
+				dst.at<uchar>(i, j) = (r + g + b) / 3;
 			}
 		}
-		
-		imshow("input image",src);
-		imshow("gray image",dst);
+
+		imshow("input image", src);
+		imshow("gray image", dst);
 		waitKey();
 	}
 }
@@ -212,12 +244,12 @@ void testBGR2HSV()
 		// definire pointer la matricea (24 biti/pixeli) a imaginii HSV
 		uchar* hsvDataPtr = hsvImg.data;
 
-		for (int i = 0; i<height; i++)
+		for (int i = 0; i < height; i++)
 		{
-			for (int j = 0; j<width; j++)
+			for (int j = 0; j < width; j++)
 			{
-				int hi = i*width * 3 + j * 3;
-				int gi = i*width + j;
+				int hi = i * width * 3 + j * 3;
+				int gi = i * width + j;
 
 				lpH[gi] = hsvDataPtr[hi] * 510 / 360;		// lpH = 0 .. 255
 				lpS[gi] = hsvDataPtr[hi + 1];			// lpS = 0 .. 255
@@ -237,18 +269,18 @@ void testBGR2HSV()
 void testResize()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		Mat src;
 		src = imread(fname);
-		Mat dst1,dst2;
+		Mat dst1, dst2;
 		//without interpolation
-		resizeImg(src,dst1,320,false);
+		resizeImg(src, dst1, 320, false);
 		//with interpolation
-		resizeImg(src,dst2,320,true);
-		imshow("input image",src);
-		imshow("resized image (without interpolation)",dst1);
-		imshow("resized image (with interpolation)",dst2);
+		resizeImg(src, dst2, 320, true);
+		imshow("input image", src);
+		imshow("resized image (without interpolation)", dst1);
+		imshow("resized image (with interpolation)", dst2);
 		waitKey();
 	}
 }
@@ -256,17 +288,17 @@ void testResize()
 void testCanny()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
-		Mat src,dst,gauss;
-		src = imread(fname,CV_LOAD_IMAGE_GRAYSCALE);
+		Mat src, dst, gauss;
+		src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
 		double k = 0.4;
 		int pH = 50;
-		int pL = (int) k*pH;
+		int pL = (int)k * pH;
 		GaussianBlur(src, gauss, Size(5, 5), 0.8, 0.8);
-		Canny(gauss,dst,pL,pH,3);
-		imshow("input image",src);
-		imshow("canny",dst);
+		Canny(gauss, dst, pL, pH, 3);
+		imshow("input image", src);
+		imshow("canny", dst);
 		waitKey();
 	}
 }
@@ -280,7 +312,7 @@ void testVideoSequence()
 		waitKey(0);
 		return;
 	}
-		
+
 	Mat edges;
 	Mat frame;
 	char c;
@@ -289,19 +321,18 @@ void testVideoSequence()
 	{
 		Mat grayFrame;
 		cvtColor(frame, grayFrame, CV_BGR2GRAY);
-		Canny(grayFrame,edges,40,100,3);
+		Canny(grayFrame, edges, 40, 100, 3);
 		imshow("source", frame);
 		imshow("gray", grayFrame);
 		imshow("edges", edges);
 		c = cvWaitKey(0);  // waits a key press to advance to the next frame
 		if (c == 27) {
 			// press ESC to exit
-			printf("ESC pressed - capture finished\n"); 
+			printf("ESC pressed - capture finished\n");
 			break;  //ESC pressed
 		};
 	}
 }
-
 
 void testSnap()
 {
@@ -315,7 +346,7 @@ void testSnap()
 	Mat frame;
 	char numberStr[256];
 	char fileName[256];
-	
+
 	// video resolution
 	Size capS = Size((int)cap.get(CV_CAP_PROP_FRAME_WIDTH),
 		(int)cap.get(CV_CAP_PROP_FRAME_HEIGHT));
@@ -343,7 +374,7 @@ void testSnap()
 		}
 
 		++frameNum;
-		
+
 		imshow(WIN_SRC, frame);
 
 		c = cvWaitKey(10);  // waits a key press to advance to the next frame
@@ -352,7 +383,7 @@ void testSnap()
 			printf("ESC pressed - capture finished");
 			break;  //ESC pressed
 		}
-		if (c == 115){ //'s' pressed - snapp the image to a file
+		if (c == 115) { //'s' pressed - snapp the image to a file
 			frameCount++;
 			fileName[0] = NULL;
 			sprintf(numberStr, "%d", frameCount);
@@ -360,7 +391,7 @@ void testSnap()
 			strcat(fileName, numberStr);
 			strcat(fileName, ".bmp");
 			bool bSuccess = imwrite(fileName, frame);
-			if (!bSuccess) 
+			if (!bSuccess)
 			{
 				printf("Error writing the snapped image\n");
 			}
@@ -376,13 +407,13 @@ void MyCallBackFunc(int event, int x, int y, int flags, void* param)
 	//More examples: http://opencvexamples.blogspot.com/2014/01/detect-mouse-clicks-and-moves-on-image.html
 	Mat* src = (Mat*)param;
 	if (event == CV_EVENT_LBUTTONDOWN)
-		{
-			printf("Pos(x,y): %d,%d  Color(RGB): %d,%d,%d\n",
-				x, y,
-				(int)(*src).at<Vec3b>(y, x)[2],
-				(int)(*src).at<Vec3b>(y, x)[1],
-				(int)(*src).at<Vec3b>(y, x)[0]);
-		}
+	{
+		printf("Pos(x,y): %d,%d  Color(RGB): %d,%d,%d\n",
+			x, y,
+			(int)(*src).at<Vec3b>(y, x)[2],
+			(int)(*src).at<Vec3b>(y, x)[1],
+			(int)(*src).at<Vec3b>(y, x)[0]);
+	}
 }
 
 void testMouseClick()
@@ -422,9 +453,9 @@ void showHistogram(const std::string& name, int* hist, const int  hist_cols, con
 
 	//computes histogram maximum
 	int max_hist = 0;
-	for (int i = 0; i<hist_cols; i++)
-	if (hist[i] > max_hist)
-		max_hist = hist[i];
+	for (int i = 0; i < hist_cols; i++)
+		if (hist[i] > max_hist)
+			max_hist = hist[i];
 	double scale = 1.0;
 	scale = (double)hist_height / max_hist;
 	int baseline = hist_height - 1;
@@ -438,14 +469,55 @@ void showHistogram(const std::string& name, int* hist, const int  hist_cols, con
 	imshow(name, imgHist);
 }
 
+
+
+//Tip de vecinatate
+enum {
+	N4, N8
+};
+
 int main()
 {
 	while (true) {
 		system("cls");
 		destroyAllWindows();
-		testThresholding();
+		//testThresholding();
+		Vec3b bg = Vec3b(0, 0, 0);
+		Mat_<uchar> src = getBinary();
+
+		//Erode
+
+		Mat_<uchar> dilatedImg = dilate(src, 20);
+		Mat_<uchar> erodedImg = erode(dilatedImg, 15);
+
+
+		Mat_<uchar> labels = labelBFS(erodedImg, 255, N8);
+		Mat_<Vec3b> labelledImg = colourForLabels(Vec3b(0, 0, 0), labels);
+
+		//saveImage(labelledImg, "imagine_etichetata");
+
+		processObject(labelledImg);
+
+		imshow("imagine etichetata", labelledImg);
+
+		filterObjectsByArea(&labelledImg, bg, AREA_THRESH);
+		filterObjectsByThinness(&labelledImg, bg, THINNESS_THRESH);
+
+		Mat_<uchar>filteredImg(src.rows, src.cols);
+		binarizeLabelled(filteredImg, labelledImg);
+
+		Mat_<uchar> finalImg(src.rows, src.cols);
+		finalImg = erode(filteredImg, 4);
+
+
+		imshow("imagine filtrata", filteredImg);
+		//imshow("imagine etichetata", labelledImg);
+		imshow("imagine finala", finalImg);
+
+		//imshow("imagine erodata", erodedImg);
+		//imshow("imagine dilatata", dilatedImg);
 		waitKey();
 	}
-		
+
 	return 0;
 }
