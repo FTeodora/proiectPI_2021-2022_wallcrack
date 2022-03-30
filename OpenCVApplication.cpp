@@ -476,13 +476,55 @@ enum {
 	N4, N8
 };
 
+Mat_<uchar> process(Mat_<uchar> src) {
+	Vec3b bg = Vec3b(0, 0, 0);
+	//Mat_<uchar> src = getBinary();
+
+	//Erode
+
+	Mat_<uchar> dilatedImg = dilate(src, 20);
+	Mat_<uchar> erodedImg = erode(dilatedImg, 15);
+
+
+	Mat_<uchar> labels = labelBFS(erodedImg, 255, N8);
+	Mat_<Vec3b> labelledImg = colourForLabels(Vec3b(0, 0, 0), labels);
+
+	//saveImage(labelledImg, "imagine_etichetata");
+
+	processObject(labelledImg);
+
+	//imshow("imagine etichetata", labelledImg);
+
+	filterObjectsByArea(&labelledImg, bg, AREA_THRESH);
+	filterObjectsByThinness(&labelledImg, bg, THINNESS_THRESH);
+
+	Mat_<uchar>filteredImg(src.rows, src.cols);
+	binarizeLabelled(filteredImg, labelledImg);
+
+	Mat_<uchar> finalImg(src.rows, src.cols);
+	finalImg = erode(filteredImg, 4);
+
+
+	//imshow("imagine filtrata", filteredImg);
+	//imshow("imagine etichetata", labelledImg);
+	//imshow("imagine finala", finalImg);
+	return finalImg;
+}
+
+Mat_<uchar> processNTimes(int n, Mat_<uchar> src) {
+	for (int i = 0; i < n; i++)
+		src = process(src);
+	return src;
+
+}
+
 int main()
 {
 	while (true) {
 		system("cls");
 		destroyAllWindows();
 		//testThresholding();
-		Vec3b bg = Vec3b(0, 0, 0);
+		/*Vec3b bg = Vec3b(0, 0, 0);
 		Mat_<uchar> src = getBinary();
 
 		//Erode
@@ -515,7 +557,11 @@ int main()
 		imshow("imagine finala", finalImg);
 
 		//imshow("imagine erodata", erodedImg);
-		//imshow("imagine dilatata", dilatedImg);
+		//imshow("imagine dilatata", dilatedImg);*/
+		Mat_<uchar> src = getBinary();
+		Mat_<uchar> finalImg(src.rows, src.cols);
+		finalImg = processNTimes(2,src);
+		imshow("imagine finala", finalImg);
 		waitKey();
 	}
 
