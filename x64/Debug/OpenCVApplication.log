@@ -1,7 +1,5 @@
 ﻿  OpenCVApplication.cpp
-C:\Users\Diana\Desktop\PI\Proiect\Proiect PI\proiectPI_2021-2022_wallcrack\OpenCVApplication.cpp(499,59): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\Diana\Desktop\PI\Proiect\Proiect PI\proiectPI_2021-2022_wallcrack\OpenCVApplication.cpp(70): warning C4715: 'getBinary': not all control paths return a value
-  OpenCVApplication.vcxproj -> C:\Users\Diana\Desktop\PI\Proiect\Proiect PI\proiectPI_2021-2022_wallcrack\x64\Debug\OpenCVApplication.exe
+  OpenCVApplication.vcxproj -> F:\VisualStudio\proiectPI_2021-2022_wallcrack\x64\Debug\OpenCVApplication.exe
   OpenCV\dll\Debug\opencv_ffmpeg340_64.dll
   OpenCV\dll\Debug\opencv_world340d.dll
           2 file(s) copied.

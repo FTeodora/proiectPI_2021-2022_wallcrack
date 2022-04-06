@@ -3,6 +3,8 @@
 int isInside(Mat img, int row, int col);
 void saveImage(Mat src, String fileName);
 
+Mat getBinary();
+
 Mat_<uchar> getObjectFromImage(Mat src, Vec3b objectPixel);
 int calculateObjectArea(Mat src, Vec3b objectPixel);
 Point objectCenterOfMass(Mat src, Vec3b objectPixel, int objectArea);
@@ -27,7 +29,7 @@ void drawHorizontalProjection(Mat* src, Vec3b objectPixel, Vec3b color = Vec3b(0
 
 //Functions with object processing
 void processObject(Mat src);
-void filterObjectsByArea(Mat* src, Vec3b backgroundColour, int areaTH);
+void filterObjectsByArea(Mat* src, Vec3b backgroundColour, int area_LOW, int area_HIGH);
 void filterObjectsByOrientation(Mat* src, Vec3b backgroundColour, float phi_LOW, float phi_HIGH);
 
 Mat_<int> labelBFS(Mat_<uchar> src, int objectPixel, int V = 1);

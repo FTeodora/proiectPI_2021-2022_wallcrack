@@ -329,7 +329,7 @@ float getObjectThinnessByLabel(std::vector<ObjectData> objectData, Vec3b color) 
 	return -1.0f;
 }
 
-void filterObjectsByArea(Mat* src, Vec3b backgroundColour, int areaTH) {
+void filterObjectsByArea(Mat* src, Vec3b backgroundColour, int area_LOW, int area_HIGH) {
 	std::vector<ObjectData> objectData;
 	ObjectData obj;
 
@@ -338,7 +338,7 @@ void filterObjectsByArea(Mat* src, Vec3b backgroundColour, int areaTH) {
 			if (src->at<Vec3b>(i, j) == backgroundColour) continue; //sarim peste daca e pixel fundal
 			auto area = getObjectAreaByLabel(objectData, src->at<Vec3b>(i, j));
 			if (area != -1) {
-				if (!(area > areaTH))
+				if (!((area >= area_LOW) && (area <= area_HIGH)))
 					src->at<Vec3b>(i, j) = backgroundColour;
 			}
 			else
@@ -523,6 +523,25 @@ void binarizeLabelled(Mat_<uchar>& src, Mat_<Vec3b> labelledImg, Vec3b bg = Vec3
 }
 
 
+Mat getBinary() {
+	char fname[MAX_PATH];
+	if (openFileDlg(fname))
+	{
+		Mat src;
+		src = imread(fname, IMREAD_GRAYSCALE);
+		Mat th2 = Mat(src.rows, src.cols, CV_8UC1);
+		Mat th3 = Mat(src.rows, src.cols, CV_8UC1);
+		Mat th4 = Mat(src.rows, src.cols, CV_8UC1);
+		double C = 0.0f;
+		adaptiveThreshold(src, th2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 15);
+		adaptiveThreshold(src, th3, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 7);
+		adaptiveThreshold(src, th4, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 12);
+
+		return th4;
+	}
+
+}
+
 //Eroziune si dilatare
 
 int xPos[] = { -1,1,0,0,-1,-1,1,1 };
@@ -564,7 +583,6 @@ Mat_<uchar> dilate(Mat_<uchar> src, int n) {
 }
 
 //Eroziune
-
 
 Mat_<uchar> erode(Mat_<uchar> src, int n) {
 	Mat_<uchar> prev = src;
