@@ -44,12 +44,12 @@ void testThresholding() {
 	}
 }
 
-Mat getBinary() {
-	char fname[MAX_PATH];
+Mat getBinary(Mat_<uchar> src) {
+	/*char fname[MAX_PATH];
 	if (openFileDlg(fname))
-	{
-		Mat src;
-		src = imread(fname, IMREAD_GRAYSCALE);
+	{*/
+		//Mat src;
+		//src = imread(fname, IMREAD_GRAYSCALE);
 		Mat th2 = Mat(src.rows, src.cols, CV_8UC1);
 		Mat th3 = Mat(src.rows, src.cols, CV_8UC1);
 		Mat th4 = Mat(src.rows, src.cols, CV_8UC1);
@@ -65,7 +65,7 @@ Mat getBinary() {
 		waitKey();*/
 
 		return th4;
-	}
+	//}
 
 }
 void testOpenImagesFld()
@@ -501,7 +501,7 @@ Mat_<uchar> process(Mat_<uchar> src) {
 	Mat_<uchar>filteredImg(src.rows, src.cols);
 	binarizeLabelled(filteredImg, labelledImg);
 
-	Mat_<uchar> finalImg(src.rows, src.cols);
+	Mat_<uchar> finalImg(src.rows, src.cols); //// nu mai trebuie 
 	finalImg = erode(filteredImg, 4);
 
 
@@ -516,6 +516,28 @@ Mat_<uchar> processNTimes(int n, Mat_<uchar> src) {
 		src = process(src);
 	return src;
 
+}
+
+Mat_<uchar> show_mask(Mat_<uchar> imgSrc, Mat_<uchar> img) {
+
+	Mat_<uchar> maskImg(img.rows, img.cols);
+
+	for (int i = 0; i < img.rows; i++) {
+		for (int j = 0; j < img.cols; j++) {
+			uchar pixel = img.at<uchar>(i, j);
+			if (pixel==255) {
+				maskImg.at<uchar>(i, j) = imgSrc.at<uchar>(i, j);
+			}
+			else {
+				/*Vec3b newPixel;
+				newPixel[0] = 0;
+				newPixel[1] = 0;
+				newPixel[2] = 0;*/
+				maskImg.at<uchar>(i, j) = 0;
+			}
+		}
+	}
+	return maskImg;
 }
 
 int main()
@@ -558,11 +580,27 @@ int main()
 
 		//imshow("imagine erodata", erodedImg);
 		//imshow("imagine dilatata", dilatedImg);*/
-		Mat_<uchar> src = getBinary();
-		Mat_<uchar> finalImg(src.rows, src.cols);
-		finalImg = processNTimes(2,src);
-		imshow("imagine finala", finalImg);
-		waitKey();
+		int n;
+		std::cin >> n;
+		Mat src;
+		// Read image from file 
+		char fname[MAX_PATH];
+		while (openFileDlg(fname))
+		{
+			Mat_<uchar> src = imread(fname,CV_LOAD_IMAGE_GRAYSCALE);
+			Mat_<uchar> srcBinary= getBinary(src);
+			Mat_<uchar> src1 = srcBinary;
+			Mat_<uchar> finalImg(src.rows, src.cols);
+			Mat_<uchar> finalImg1(src.rows, src.cols);
+			finalImg = processNTimes(1, srcBinary);
+			finalImg1 = processNTimes(n, srcBinary);
+			imshow("imagine procesata 1 data", finalImg);
+			imshow("imagine procesata n ori", finalImg1);
+			Mat_<uchar> maskImg = show_mask(src, finalImg);
+			imshow("original", src);
+			imshow("mask", maskImg);
+			waitKey();
+		}
 	}
 
 	return 0;
