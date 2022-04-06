@@ -1,8 +1,1 @@
-﻿  stdafx.cpp
-  common.cpp
-  OpenCVApplication.cpp
-  Generating Code...
-  OpenCVApplication.vcxproj -> C:\Users\swagv\Desktop\facultate\An3\sem2\PI\Proiect\Proiect\x64\Debug\OpenCVApplication.exe
-  OpenCV\dll\Debug\opencv_ffmpeg340_64.dll
-  OpenCV\dll\Debug\opencv_world340d.dll
-          2 file(s) copied.
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(436,5): error MSB8020: The build tools for Visual Studio 2019 (Platform Toolset = 'v142') cannot be found. To build using the v142 build tools, please install Visual Studio 2019 build tools.  Alternatively, you may upgrade to the current Visual Studio tools by selecting the Project menu or right-click the solution, and then selecting "Retarget solution".
