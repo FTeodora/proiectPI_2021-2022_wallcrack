@@ -523,12 +523,7 @@ void binarizeLabelled(Mat_<uchar>& src, Mat_<Vec3b> labelledImg, Vec3b bg = Vec3
 }
 
 
-Mat getBinary() {
-	char fname[MAX_PATH];
-	if (openFileDlg(fname))
-	{
-		Mat src;
-		src = imread(fname, IMREAD_GRAYSCALE);
+Mat getBinary(Mat src) {
 		Mat th2 = Mat(src.rows, src.cols, CV_8UC1);
 		Mat th3 = Mat(src.rows, src.cols, CV_8UC1);
 		Mat th4 = Mat(src.rows, src.cols, CV_8UC1);
@@ -538,7 +533,6 @@ Mat getBinary() {
 		adaptiveThreshold(src, th4, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 12);
 
 		return th4;
-	}
 
 }
 

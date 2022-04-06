@@ -63,7 +63,6 @@ Mat_<uchar> process(Mat_<uchar> src) {
 	Mat_<uchar>filteredImg(src.rows, src.cols);
 	binarizeLabelled(filteredImg, labelledImg);
 
-	Mat_<uchar> finalImg(src.rows, src.cols);
 	finalImg = erode(filteredImg, 4);
 
 	finalImg = filteredImg.clone();
@@ -89,10 +88,6 @@ Mat_<uchar> show_mask(Mat_<uchar> imgSrc, Mat_<uchar> img) {
 				maskImg.at<uchar>(i, j) = imgSrc.at<uchar>(i, j);
 			}
 			else {
-				/*Vec3b newPixel;
-				newPixel[0] = 0;
-				newPixel[1] = 0;
-				newPixel[2] = 0;*/
 				maskImg.at<uchar>(i, j) = 0;
 			}
 		}
@@ -102,15 +97,25 @@ Mat_<uchar> show_mask(Mat_<uchar> imgSrc, Mat_<uchar> img) {
 
 int main()
 {
-	while (true) {
+
 		system("cls");
 		destroyAllWindows();
-		Mat_<uchar> src = getBinary();
-		Mat_<uchar> finalImg(src.rows, src.cols);
-		finalImg = process(src);
-		imshow("imagine finala", finalImg);
-		waitKey();
-	}
+		char fname[MAX_PATH];
+		while (openFileDlg(fname))
+		{
+			Mat_<uchar> original;
+			original = imread(fname, IMREAD_GRAYSCALE);
+			Mat_<uchar> src = getBinary(original);
+			Mat_<uchar> finalImg1(src.rows, src.cols);
+			Mat_<uchar> maskImg(src.rows, src.cols);
+			finalImg1 = process(src);
+			maskImg = show_mask(original, finalImg1);
+			imshow("imagine finala", finalImg1);
+			imshow("imagine originala", original);
+			imshow("masca", maskImg);
+			waitKey();
+		}
+
 
 	return 0;
 }

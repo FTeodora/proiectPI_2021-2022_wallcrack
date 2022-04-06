@@ -3,7 +3,7 @@
 int isInside(Mat img, int row, int col);
 void saveImage(Mat src, String fileName);
 
-Mat getBinary();
+Mat getBinary(Mat src);
 
 Mat_<uchar> getObjectFromImage(Mat src, Vec3b objectPixel);
 int calculateObjectArea(Mat src, Vec3b objectPixel);
