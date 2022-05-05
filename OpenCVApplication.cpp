@@ -8,8 +8,8 @@
 
 
 #define THRESH 127
-#define THINNESS_THRESH 0.25
-#define AREA_THRESH_LOW 10
+#define THINNESS_THRESH 0.40
+#define AREA_THRESH_LOW 1
 #define AREA_THRESH_HIGH 200
 
 
@@ -56,8 +56,9 @@ Mat_<uchar> process(Mat_<uchar> src) {
 
 	//Pas 5 + final : filtrarea obiectelor
 	//obiecte cu thinness mai mic decat thresh
-	//filterObjectsByThinness(&labelledImg, bg, THINNESS_THRESH);
-	//filterObjectsByArea(&labelledImg, bg, AREA_THRESH_LOW, AREA_THRESH_HIGH);
+	//processObject(labelledImg);
+	filterObjectsByThinness(&labelledImg, bg, THINNESS_THRESH);
+	filterObjectsByArea(&labelledImg, bg, AREA_THRESH_LOW, AREA_THRESH_HIGH);
 
 
 	Mat_<uchar>filteredImg(src.rows, src.cols);
