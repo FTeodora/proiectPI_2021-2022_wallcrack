@@ -630,26 +630,9 @@ Mat_<uchar> erode(Mat_<uchar> src, int n) {
 	https://docs.opencv.org/3.4/d2/d74/tutorial_js_histogram_equalization.html#:~:text=In%20adaptive%20histogram%20equalization%2C%20image,there%2C%20it%20will%20be%20amplified.
 
 */
-Mat_<uchar> otsuThresh(Mat_<uchar> src) {
-	//Mat_<uchar> src1=Mat(src.rows,src.cols,CV_8UC1);
-	/*
-		Attempt 1:
-		O functie de egalizare a histogramei intr-un mod global
-		Imi duce otsu pana la capat, dar dupa cand iese din functie imi da ceva cu abort???
-		*/
-		//equalizeHist(src, src1);
-		/*
-			Attempt 2:
-			CLAHE (Contrast Limited Adaptive Histogram Equalization)
-			Ceva egalizare adaptiva din cate am inteles
-			Also, daca exista zgomot in imagine, o sa-l amplifice
-
-			cand fac u->apply imi da exit cu un cod dubios si nu am reusit sa gasesc prea multe informatii utile despre asta
-			*/
-			//CLAHE* u = createCLAHE(40.0f,Size(8,8));
-			//u->apply(src, src1);
-			//u->collectGarbage();
-	unsigned int hist[255];
+int otsuThresh(Mat_<uchar> src) {
+	
+	unsigned int hist[256];
 	uchar thresh = 0;
 	int max_var = 0;
 	unsigned long sum = 0, sum2 = 0, var;
@@ -685,7 +668,7 @@ Mat_<uchar> otsuThresh(Mat_<uchar> src) {
 
 	}
 	std::cout << "Thresh found: " << thresh << std::endl;
-	Mat_<uchar> dst = Mat(src.rows, src.cols, CV_8UC1);
+	/*Mat_<uchar> dst = Mat(src.rows, src.cols, CV_8UC1);
 	for (int i = 0; i < src.rows; i++) {
 		for (int j = 0; j < src.cols; j++) {
 			if (src(i, j) < thresh)
@@ -693,7 +676,7 @@ Mat_<uchar> otsuThresh(Mat_<uchar> src) {
 			else
 				dst(i, j) = 0;
 		}
-	}
-	std::cout << "Otsu thresh done\n";
-	return dst;
+	}*/
+	//std::cout << "Otsu thresh done\n";
+	return thresh;
 }
