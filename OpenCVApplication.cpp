@@ -85,7 +85,7 @@ Mat_<uchar> show_mask(Mat_<uchar> imgSrc, Mat_<uchar> img) {
 	for (int i = 0; i < img.rows; i++) {
 		for (int j = 0; j < img.cols; j++) {
 			uchar pixel = img.at<uchar>(i, j);
-			if (pixel==255) {
+			if (pixel == 255) {
 				maskImg.at<uchar>(i, j) = imgSrc.at<uchar>(i, j);
 			}
 			else {
@@ -99,23 +99,23 @@ Mat_<uchar> show_mask(Mat_<uchar> imgSrc, Mat_<uchar> img) {
 int main()
 {
 
-		system("cls");
-		destroyAllWindows();
-		char fname[MAX_PATH];
-		while (openFileDlg(fname))
-		{
-			Mat_<uchar> original;
-			original = imread(fname, IMREAD_GRAYSCALE);
-			Mat_<uchar> src = getBinary(original);
-			Mat_<uchar> finalImg1(src.rows, src.cols);
-			Mat_<uchar> maskImg(src.rows, src.cols);
-			finalImg1 = process(src);
-			maskImg = show_mask(original, finalImg1);
-			imshow("imagine finala", finalImg1);
-			imshow("imagine originala", original);
-			imshow("masca", maskImg);
-			waitKey();
-		}
+	system("cls");
+	destroyAllWindows();
+	char fname[MAX_PATH];
+	while (openFileDlg(fname))
+	{
+		Mat_<uchar> original;
+		original = imread(fname, IMREAD_GRAYSCALE);
+		Mat_<uchar> src = getBinary(original);
+		Mat_<uchar> finalImg1(src.rows, src.cols);
+		Mat_<uchar> maskImg(src.rows, src.cols);
+		finalImg1 = process(src);
+		maskImg = show_mask(original, finalImg1);
+		imshow("imagine finala", finalImg1);
+		imshow("imagine originala", original);
+		imshow("masca", maskImg);
+		waitKey();
+	}
 
 
 	return 0;
