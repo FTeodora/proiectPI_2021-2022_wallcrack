@@ -38,6 +38,11 @@ void filterObjectsByThinness(Mat* src, Vec3b backgroundColour, float thinnessTH)
 
 void binarizeLabelled(Mat_<uchar>& src, Mat_<Vec3b> labelledImg, Vec3b bg = Vec3b(0, 0, 0));
 
+
+//src = originalBinaryImage
+float getBinary2(Mat src, Mat labelledImg);
+void filterObjectsByAreaM(Mat* src, Vec3b backgroundColour, int area_HIGH);
+
 //Eroziune+Dilatare
 Mat_<uchar> dilate(Mat_<uchar> src, int n);
 Mat_<uchar> erode(Mat_<uchar> src, int n);

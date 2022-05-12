@@ -279,6 +279,8 @@ void onSelectedObject(int event, int x, int y, int flags, void* param)
 	}
 }
 
+
+
 void processObject(Mat src) {
 	//Mat src;
 	// Read image from file 
@@ -304,6 +306,7 @@ void processObject(Mat src) {
 typedef struct {
 	Vec3b label;
 	long double area = -1;
+	int perim = -1;
 	float orientationPhi = -1.0f;
 	float thinness = -1.0f;
 }ObjectData;
@@ -339,6 +342,34 @@ void filterObjectsByArea(Mat* src, Vec3b backgroundColour, int area_LOW, int are
 			auto area = getObjectAreaByLabel(objectData, src->at<Vec3b>(i, j));
 			if (area != -1) {
 				if (!((area >= area_LOW) && (area <= area_HIGH)))
+					src->at<Vec3b>(i, j) = backgroundColour;
+			}
+			else
+			{
+				//Daca am dat de o eticheta noua
+				obj.area = calculateObjectArea(*src, src->at<Vec3b>(i, j));
+				obj.label = src->at<Vec3b>(i, j);
+				objectData.push_back(obj);
+				//printf("(Label,Area): ((%d, %d, %d), %.2lf)\n", obj.label[0], obj.label[1], obj.label[2], obj.area);
+
+			}
+
+			//continue;
+		}
+
+	}
+}
+
+void filterObjectsByAreaM(Mat* src, Vec3b backgroundColour, int area_HIGH) {
+	std::vector<ObjectData> objectData;
+	ObjectData obj;
+
+	for (int i = 0; i < src->rows; i++) {
+		for (int j = 0; j < src->cols; j++) {
+			if (src->at<Vec3b>(i, j) == backgroundColour) continue; //sarim peste daca e pixel fundal
+			auto area = getObjectAreaByLabel(objectData, src->at<Vec3b>(i, j));
+			if (area != -1) {
+				if (area <= area_HIGH)
 					src->at<Vec3b>(i, j) = backgroundColour;
 			}
 			else
@@ -523,17 +554,190 @@ void binarizeLabelled(Mat_<uchar>& src, Mat_<Vec3b> labelledImg, Vec3b bg = Vec3
 }
 
 
+
+
 Mat getBinary(Mat src) {
-		Mat th2 = Mat(src.rows, src.cols, CV_8UC1);
-		Mat th3 = Mat(src.rows, src.cols, CV_8UC1);
-		Mat th4 = Mat(src.rows, src.cols, CV_8UC1);
-		double C = 0.0f;
-		adaptiveThreshold(src, th2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 15);
-		adaptiveThreshold(src, th3, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 7);
-		adaptiveThreshold(src, th4, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 12);
+	Mat th2 = Mat(src.rows, src.cols, CV_8UC1);
+	Mat th3 = Mat(src.rows, src.cols, CV_8UC1);
+	Mat th4 = Mat(src.rows, src.cols, CV_8UC1);
+	double C = 0.0f;
+	adaptiveThreshold(src, th2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 15);
+	adaptiveThreshold(src, th3, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 7);
+	adaptiveThreshold(src, th4, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 11, 12);
 
-		return th4;
+	return th4;
 
+}
+
+
+
+ObjectData createObjectFromLabel(Mat* src, Vec3b originalPixelLabel) {
+	ObjectData obj;
+	Vec3b backgroundColour = Vec3b(0, 0, 0);
+
+	obj.label = originalPixelLabel;
+
+	//if (originalPixelLabel == backgroundColour) { printf("Select an object!\n"); return; }
+
+	//Aria
+
+	int area = calculateObjectArea(*src, originalPixelLabel);
+	//printf("Area of object: %d\n", area);
+
+	obj.area = area;
+
+	//Centrul de masa
+	Point massCenter(-1, -1);
+	//objectCenterOfMass(*src, originalPixelLabel, massCenterX, massCenterY, area);
+	massCenter = objectCenterOfMass(*src, originalPixelLabel, area);
+	if (massCenter != Point(-1, -1)) {
+		//printf("Center of mass: (%d,%d)\n", *massCenterY, *massCenterX);
+		//std::cout << "Center of mass: " << massCenter << std::endl;
+	}
+	else
+	{
+		//printf("Error at finding the center of mass coordinates.\n");
+	}
+
+	//Axa de alungire - Axis of elongation
+	float* a = (float*)malloc(sizeof(float));
+	float* b = (float*)malloc(sizeof(float));
+	float* c = (float*)malloc(sizeof(float));
+	//float* angle = (float*)malloc(sizeof(float));
+	*a = -1; *b = -1; *c = -1;
+	//auto angle = -999;
+	elongationAxisOperands(*src, originalPixelLabel, massCenter, a, b, c);
+	if ((*a != -1) && (*b != -1) && (*c != -1)) {
+		auto angle = elongationAxisTangent(*a, *b, *c);
+		//printf("Axis of elongation angle: %f\n", *angle);
+		//std::cout << "Axis of elongation angle: " << angle << std::endl;
+		obj.orientationPhi = angle;
+	}
+	else {
+		//printf("Error at calculating operands for axis of elongation.\n");
+	}
+
+	//Perimetrul - Perimeter
+	int perimeter = calculateObjectPerimeter(*src, originalPixelLabel, backgroundColour);
+	//printf("Object Perimeter: %d\n", perimeter); //* (PI / 4)); ?
+	obj.perim = perimeter;
+
+
+	//Thiness ratio - circularity
+	float thinRatio = thinnessRatio(area, perimeter);
+	//printf("Thiness ratio: %f\n", thinRatio);
+	obj.thinness = thinRatio;
+
+	//Elongatia - Aspect Ratio
+	float aspRatio = aspectRatio(*src, originalPixelLabel);
+	//printf("Aspect ratio: %f\n", aspRatio);
+
+
+	//printf("\n");
+
+
+	return obj;
+}
+
+//-functie binarizare: parametri sa fie imag sursa, returneaza prag , lista obiecte ramase si lista obiecte eliminate
+
+bool isLabelInVector(vector<Vec3b> labels, Vec3b label) {
+	for (auto l : labels) {
+		if (l == label)
+			return true;
+	}
+
+	return false;
+}
+
+//src = originalBinaryImage
+float getBinary2(Mat src, Mat labelledImg) {
+	int th = -1;
+	vector<ObjectData> remained;
+	vector<ObjectData> removed;
+
+	Mat_<uchar> labels = labelBFS(src, 255, 1);
+	Mat_<Vec3b>labelledSrc = colourForLabels(Vec3b(0, 0, 0), labels);
+
+	Vec3b bg = Vec3b(0, 0, 0);
+	vector<Vec3b> visitedLabels;
+
+	imshow("labelledSrc", labelledSrc);
+
+	for (int i = 0; i < src.rows; i++) {
+		for (int j = 0; j < src.cols; j++) {
+			//if (labelledImg.at<Vec3b>(i, j) != Vec3b(0, 0, 0)) {
+			//	//ObjectData obj = createObjectFromLabel(&labelledImg, labelledImg.at<Vec3b>(i, j));
+			//	if (!isLabelInVector(visitedLabels, labelledImg.at<Vec3b>(i, j))) {
+			//		ObjectData obj = createObjectFromLabel(&labelledImg, labelledImg.at<Vec3b>(i, j));
+			//		if (src.at<uchar>(i, j) == 255 && obj.area > 2) {
+			//			remained.push_back(obj);
+			//		}
+			//		else {
+			//			if (src.at<uchar>(i, j) == 0)
+			//				removed.push_back(obj);
+			//		}
+
+			//		visitedLabels.push_back(labelledImg.at<Vec3b>(i, j));
+			//	}
+			//}
+
+			/*if (src.at<uchar>(i, j) == 255 && labelledImg.at<Vec3b>(i, j) != Vec3b(0, 0, 0) && !isLabelInVector(visitedLabels, labelledImg.at<Vec3b>(i, j))) {
+				ObjectData obj = createObjectFromLabel(&labelledImg, labelledImg.at<Vec3b>(i, j));
+				remained.push_back(obj);
+				visitedLabels.push_back(labelledImg.at<Vec3b>(i, j));
+			}
+			else {
+				if (src.at<uchar>(i, j) == 255 && labelledImg.at<Vec3b>(i, j) == Vec3b(0, 0, 0)) {
+					ObjectData obj2 = createObjectFromLabel(&labelledSrc, labelledSrc.at<Vec3b>(i, j));
+					removed.push_back(obj2);
+
+				}
+			}*/
+
+			if (labelledSrc.at<Vec3b>(i, j) != bg && labelledImg.at<Vec3b>(i, j) != bg && !isLabelInVector(visitedLabels, labelledSrc.at<Vec3b>(i, j))) {
+				ObjectData obj = createObjectFromLabel(&labelledSrc, labelledSrc.at<Vec3b>(i, j));
+				if (obj.area > 2) {
+					remained.push_back(obj);
+					visitedLabels.push_back(labelledSrc.at<Vec3b>(i, j));
+				}
+				else {
+					removed.push_back(obj);
+					visitedLabels.push_back(labelledSrc.at<Vec3b>(i, j));
+				}
+			}
+			else {
+				if (labelledSrc.at<Vec3b>(i, j) != bg && labelledImg.at<Vec3b>(i, j) == bg && !isLabelInVector(visitedLabels, labelledSrc.at<Vec3b>(i, j))) {
+					ObjectData obj = createObjectFromLabel(&labelledSrc, labelledSrc.at<Vec3b>(i, j));
+					removed.push_back(obj);
+					visitedLabels.push_back(labelledSrc.at<Vec3b>(i, j));
+					//std::cout << "removed path" << std::endl;
+				}
+			}
+
+		}
+
+	}
+
+
+	std::cout << "total objects: " << remained.size() + removed.size() << std::endl;
+
+	std::cout << "remained objects count: " << remained.size() << std::endl;
+
+
+	//Mat_<uchar> bin(labelledImg.rows, labelledImg.cols);
+	//binarizeLabelled(bin, labelledImg);
+
+	float averageRemovedArea = 0;
+
+	for (auto obj : removed) {
+		averageRemovedArea += obj.area;
+	}
+
+	averageRemovedArea /= (float)removed.size();
+
+
+	return averageRemovedArea;
 }
 
 //Eroziune si dilatare

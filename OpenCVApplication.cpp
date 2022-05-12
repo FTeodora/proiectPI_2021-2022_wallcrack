@@ -23,8 +23,9 @@ Mat_<uchar> process(Mat_<uchar> src) {
 	Vec3b bg = Vec3b(0, 0, 0);
 	Mat_<uchar> finalImg(src.rows, src.cols);
 
-	//Pas 1 : avem imaginea binarizata
+	//Pas 1.1 : avem imaginea binarizata
 
+	//imshow("1.1 - Binary Image", src);
 	//Pas 2 : facem dilatarea
 	int dilation_size = 1; //dim elementului structural
 
@@ -34,6 +35,8 @@ Mat_<uchar> process(Mat_<uchar> src) {
 
 	Mat_<uchar> dilatedImg;
 	dilate(src, dilatedImg, elementD, Point(-1, -1), 4); //ult param e nr de iteratii
+
+	//imshow("1.2 - Dilated Image", dilatedImg);
 
 
 	//Pas 3 : facem eroziunea
@@ -46,6 +49,9 @@ Mat_<uchar> process(Mat_<uchar> src) {
 	Mat_<uchar> erodedImg;
 	erode(dilatedImg, erodedImg, elementE, Point(-1, -1), 1);
 
+	//imshow("1.3 - Eroded Image", erodedImg);
+
+	Mat_<uchar>erodedCopy = erodedImg.clone();
 
 	//Pas 4 : etichetarea imaginii
 	Mat_<uchar> labels = labelBFS(erodedImg, 255, N8);
@@ -54,12 +60,28 @@ Mat_<uchar> process(Mat_<uchar> src) {
 	//functia pentru aflarea proprietatilor geometrice
 	//processObject(labelledImg);
 
+	//getBinary2(src,labelledImg)
+
+	//imshow("1.4 - Labelled Image", labelledImg);
+
 	//Pas 5 + final : filtrarea obiectelor
 	//obiecte cu thinness mai mic decat thresh
 	//processObject(labelledImg);
 	filterObjectsByThinness(&labelledImg, bg, THINNESS_THRESH);
 	filterObjectsByArea(&labelledImg, bg, AREA_THRESH_LOW, AREA_THRESH_HIGH);
 
+	//imshow("1.5 - Filtered Image", labelledImg);
+
+	imshow("Eroded Img", erodedCopy);
+	imshow("Labelled Img", labelledImg);
+
+
+	std::cout << "Buna!" << std::endl;
+	float avg = getBinary2(erodedCopy, labelledImg);
+
+	filterObjectsByAreaM(&labelledImg, bg, avg);
+
+	imshow("Labelled Img After Second Filter", labelledImg);
 
 	Mat_<uchar>filteredImg(src.rows, src.cols);
 	binarizeLabelled(filteredImg, labelledImg);
