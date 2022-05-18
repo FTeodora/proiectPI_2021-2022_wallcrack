@@ -1,12 +1,37 @@
-﻿  OpenCVApplication.cpp
-C:\Users\swagv\source\repos\proiectPI_2021-2022_wallcrack\func.h(46,16): warning C5208: unnamed class used in typedef name cannot declare members other than non-static data members, member enumerations, or member classes
-C:\Users\swagv\source\repos\proiectPI_2021-2022_wallcrack\OpenCVApplication.cpp(134,75): warning C4305: 'argument': truncation from 'double' to 'float'
+﻿  stdafx.cpp
+  common.cpp
+  func.cpp
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(88,18): warning C4244: 'argument': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=int
+          ]
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(88,15): warning C4244: 'argument': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=int
+          ]
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(124,28): warning C4244: '=': conversion from 'long double' to 'int', possible loss of data
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(125,28): warning C4244: '=': conversion from 'long double' to 'int', possible loss of data
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(149,30): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(188,73): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(189,73): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(190,73): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(191,73): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(306,16): warning C5208: unnamed class used in typedef name cannot declare members other than non-static data members, member enumerations, or member classes
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(407,74): warning C4244: 'argument': conversion from 'long double' to 'int', possible loss of data
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(412,47): warning C4244: '=': conversion from 'long double' to 'float', possible loss of data
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(506,16): warning C5208: unnamed class used in typedef name cannot declare members other than non-static data members, member enumerations, or member classes
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.cpp(614,24): warning C4244: '=': conversion from 'long double' to 'float', possible loss of data
   mainf.cpp
-C:\Users\swagv\source\repos\proiectPI_2021-2022_wallcrack\func.h(46,16): warning C5208: unnamed class used in typedef name cannot declare members other than non-static data members, member enumerations, or member classes
-C:\Users\swagv\source\repos\proiectPI_2021-2022_wallcrack\mainf.cpp(151,28): warning C4244: '+=': conversion from 'long double' to 'float', possible loss of data
-C:\Users\swagv\source\repos\proiectPI_2021-2022_wallcrack\mainf.cpp(158,38): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.h(46,16): warning C5208: unnamed class used in typedef name cannot declare members other than non-static data members, member enumerations, or member classes
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\mainf.cpp(151,28): warning C4244: '+=': conversion from 'long double' to 'float', possible loss of data
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\mainf.cpp(158,38): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+  OpenCVApplication.cpp
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\func.h(46,16): warning C5208: unnamed class used in typedef name cannot declare members other than non-static data members, member enumerations, or member classes
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\OpenCVApplication.cpp(134,75): warning C4305: 'argument': truncation from 'double' to 'float'
   Generating Code...
-  OpenCVApplication.vcxproj -> C:\Users\swagv\source\repos\proiectPI_2021-2022_wallcrack\x64\Debug\OpenCVApplication.exe
+  OpenCVApplication.vcxproj -> D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\x64\Debug\OpenCVApplication.exe
   OpenCV\dll\Debug\opencv_ffmpeg340_64.dll
   OpenCV\dll\Debug\opencv_world340d.dll
           2 file(s) copied.

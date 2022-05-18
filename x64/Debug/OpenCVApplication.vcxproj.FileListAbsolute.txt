@@ -3,3 +3,4 @@ F:\VisualStudio\proiectPI_2021-2022_wallcrack_T\x64\Debug\OpenCVApplication.exe
 F:\VisualStudio\proiectPI_2021-2022_wallcrack\x64\Debug\OpenCVApplication.exe
 C:\Users\Diana\Desktop\PI\Proiect\Proiect PI\proiectPI_2021-2022_wallcrack\x64\Debug\OpenCVApplication.exe
 C:\Users\swagv\source\repos\proiectPI_2021-2022_wallcrack\x64\Debug\OpenCVApplication.exe
+D:\Windows F\VisualStudio\proiectPI_2021-2022_wallcrack\x64\Debug\OpenCVApplication.exe
