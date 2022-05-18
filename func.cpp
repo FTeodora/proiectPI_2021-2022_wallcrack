@@ -332,7 +332,7 @@ float getObjectThinnessByLabel(std::vector<ObjectData> objectData, Vec3b color) 
 	return -1.0f;
 }
 
-void filterObjectsByArea(Mat* src, Vec3b backgroundColour, int areaTH) {
+void filterObjectsByArea(Mat* src, Vec3b backgroundColour, int area_LOW, int area_HIGH) {
 	std::vector<ObjectData> objectData;
 	ObjectData obj;
 
@@ -341,7 +341,7 @@ void filterObjectsByArea(Mat* src, Vec3b backgroundColour, int areaTH) {
 			if (src->at<Vec3b>(i, j) == backgroundColour) continue; //sarim peste daca e pixel fundal
 			auto area = getObjectAreaByLabel(objectData, src->at<Vec3b>(i, j));
 			if (area != -1) {
-				if (!(area > areaTH))
+				if (!((area >= area_LOW) && (area <= area_HIGH)))
 					src->at<Vec3b>(i, j) = backgroundColour;
 			}
 			else
@@ -651,94 +651,94 @@ bool isLabelInVector(vector<Vec3b> labels, Vec3b label) {
 }
 
 //src = originalBinaryImage
-float getBinary2(Mat src, Mat labelledImg) {
-	int th = -1;
-	vector<ObjectData> remained;
-	vector<ObjectData> removed;
-
-	Mat_<uchar> labels = labelBFS(src, 255, 1);
-	Mat_<Vec3b>labelledSrc = colourForLabels(Vec3b(0, 0, 0), labels);
-
-	Vec3b bg = Vec3b(0, 0, 0);
-	vector<Vec3b> visitedLabels;
-
-	imshow("labelledSrc", labelledSrc);
-
-	for (int i = 0; i < src.rows; i++) {
-		for (int j = 0; j < src.cols; j++) {
-			//if (labelledImg.at<Vec3b>(i, j) != Vec3b(0, 0, 0)) {
-			//	//ObjectData obj = createObjectFromLabel(&labelledImg, labelledImg.at<Vec3b>(i, j));
-			//	if (!isLabelInVector(visitedLabels, labelledImg.at<Vec3b>(i, j))) {
-			//		ObjectData obj = createObjectFromLabel(&labelledImg, labelledImg.at<Vec3b>(i, j));
-			//		if (src.at<uchar>(i, j) == 255 && obj.area > 2) {
-			//			remained.push_back(obj);
-			//		}
-			//		else {
-			//			if (src.at<uchar>(i, j) == 0)
-			//				removed.push_back(obj);
-			//		}
-
-			//		visitedLabels.push_back(labelledImg.at<Vec3b>(i, j));
-			//	}
-			//}
-
-			/*if (src.at<uchar>(i, j) == 255 && labelledImg.at<Vec3b>(i, j) != Vec3b(0, 0, 0) && !isLabelInVector(visitedLabels, labelledImg.at<Vec3b>(i, j))) {
-				ObjectData obj = createObjectFromLabel(&labelledImg, labelledImg.at<Vec3b>(i, j));
-				remained.push_back(obj);
-				visitedLabels.push_back(labelledImg.at<Vec3b>(i, j));
-			}
-			else {
-				if (src.at<uchar>(i, j) == 255 && labelledImg.at<Vec3b>(i, j) == Vec3b(0, 0, 0)) {
-					ObjectData obj2 = createObjectFromLabel(&labelledSrc, labelledSrc.at<Vec3b>(i, j));
-					removed.push_back(obj2);
-
-				}
-			}*/
-
-			if (labelledSrc.at<Vec3b>(i, j) != bg && labelledImg.at<Vec3b>(i, j) != bg && !isLabelInVector(visitedLabels, labelledSrc.at<Vec3b>(i, j))) {
-				ObjectData obj = createObjectFromLabel(&labelledSrc, labelledSrc.at<Vec3b>(i, j));
-				if (obj.area > 2) {
-					remained.push_back(obj);
-					visitedLabels.push_back(labelledSrc.at<Vec3b>(i, j));
-				}
-				else {
-					removed.push_back(obj);
-					visitedLabels.push_back(labelledSrc.at<Vec3b>(i, j));
-				}
-			}
-			else {
-				if (labelledSrc.at<Vec3b>(i, j) != bg && labelledImg.at<Vec3b>(i, j) == bg && !isLabelInVector(visitedLabels, labelledSrc.at<Vec3b>(i, j))) {
-					ObjectData obj = createObjectFromLabel(&labelledSrc, labelledSrc.at<Vec3b>(i, j));
-					removed.push_back(obj);
-					visitedLabels.push_back(labelledSrc.at<Vec3b>(i, j));
-					//std::cout << "removed path" << std::endl;
-				}
-			}
-
-		}
-
-	}
-
-
-	std::cout << "total objects: " << remained.size() + removed.size() << std::endl;
-
-	std::cout << "remained objects count: " << remained.size() << std::endl;
-
-
-	//Mat_<uchar> bin(labelledImg.rows, labelledImg.cols);
-	//binarizeLabelled(bin, labelledImg);
-
-	float averageRemovedArea = 0;
-
-	for (auto obj : removed) {
-		averageRemovedArea += obj.area;
-	}
-
-	averageRemovedArea /= (float)removed.size();
-
-
-	return averageRemovedArea;
-}
+//float getBinary2(Mat src, Mat labelledImg) {
+//	int th = -1;
+//	vector<ObjectData> remained;
+//	vector<ObjectData> removed;
+//
+//	Mat_<uchar> labels = labelBFS(src, 255, 1);
+//	Mat_<Vec3b>labelledSrc = colourForLabels(Vec3b(0, 0, 0), labels);
+//
+//	Vec3b bg = Vec3b(0, 0, 0);
+//	vector<Vec3b> visitedLabels;
+//
+//	imshow("labelledSrc", labelledSrc);
+//
+//	for (int i = 0; i < src.rows; i++) {
+//		for (int j = 0; j < src.cols; j++) {
+//			//if (labelledImg.at<Vec3b>(i, j) != Vec3b(0, 0, 0)) {
+//			//	//ObjectData obj = createObjectFromLabel(&labelledImg, labelledImg.at<Vec3b>(i, j));
+//			//	if (!isLabelInVector(visitedLabels, labelledImg.at<Vec3b>(i, j))) {
+//			//		ObjectData obj = createObjectFromLabel(&labelledImg, labelledImg.at<Vec3b>(i, j));
+//			//		if (src.at<uchar>(i, j) == 255 && obj.area > 2) {
+//			//			remained.push_back(obj);
+//			//		}
+//			//		else {
+//			//			if (src.at<uchar>(i, j) == 0)
+//			//				removed.push_back(obj);
+//			//		}
+//
+//			//		visitedLabels.push_back(labelledImg.at<Vec3b>(i, j));
+//			//	}
+//			//}
+//
+//			/*if (src.at<uchar>(i, j) == 255 && labelledImg.at<Vec3b>(i, j) != Vec3b(0, 0, 0) && !isLabelInVector(visitedLabels, labelledImg.at<Vec3b>(i, j))) {
+//				ObjectData obj = createObjectFromLabel(&labelledImg, labelledImg.at<Vec3b>(i, j));
+//				remained.push_back(obj);
+//				visitedLabels.push_back(labelledImg.at<Vec3b>(i, j));
+//			}
+//			else {
+//				if (src.at<uchar>(i, j) == 255 && labelledImg.at<Vec3b>(i, j) == Vec3b(0, 0, 0)) {
+//					ObjectData obj2 = createObjectFromLabel(&labelledSrc, labelledSrc.at<Vec3b>(i, j));
+//					removed.push_back(obj2);
+//
+//				}
+//			}*/
+//
+//			if (labelledSrc.at<Vec3b>(i, j) != bg && labelledImg.at<Vec3b>(i, j) != bg && !isLabelInVector(visitedLabels, labelledSrc.at<Vec3b>(i, j))) {
+//				ObjectData obj = createObjectFromLabel(&labelledSrc, labelledSrc.at<Vec3b>(i, j));
+//				if (obj.area > 2) {
+//					remained.push_back(obj);
+//					visitedLabels.push_back(labelledSrc.at<Vec3b>(i, j));
+//				}
+//				else {
+//					removed.push_back(obj);
+//					visitedLabels.push_back(labelledSrc.at<Vec3b>(i, j));
+//				}
+//			}
+//			else {
+//				if (labelledSrc.at<Vec3b>(i, j) != bg && labelledImg.at<Vec3b>(i, j) == bg && !isLabelInVector(visitedLabels, labelledSrc.at<Vec3b>(i, j))) {
+//					ObjectData obj = createObjectFromLabel(&labelledSrc, labelledSrc.at<Vec3b>(i, j));
+//					removed.push_back(obj);
+//					visitedLabels.push_back(labelledSrc.at<Vec3b>(i, j));
+//					//std::cout << "removed path" << std::endl;
+//				}
+//			}
+//
+//		}
+//
+//	}
+//
+//
+//	std::cout << "total objects: " << remained.size() + removed.size() << std::endl;
+//
+//	std::cout << "remained objects count: " << remained.size() << std::endl;
+//
+//
+//	//Mat_<uchar> bin(labelledImg.rows, labelledImg.cols);
+//	//binarizeLabelled(bin, labelledImg);
+//
+//	float averageRemovedArea = 0;
+//
+//	for (auto obj : removed) {
+//		averageRemovedArea += obj.area;
+//	}
+//
+//	averageRemovedArea /= (float)removed.size();
+//
+//
+//	return averageRemovedArea;
+//}
 
 //Eroziune si dilatare
 
@@ -781,7 +781,6 @@ Mat_<uchar> dilate(Mat_<uchar> src, int n) {
 }
 
 //Eroziune
-
 
 Mat_<uchar> erode(Mat_<uchar> src, int n) {
 	Mat_<uchar> prev = src;

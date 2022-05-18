@@ -29,7 +29,7 @@ void drawHorizontalProjection(Mat* src, Vec3b objectPixel, Vec3b color = Vec3b(0
 
 //Functions with object processing
 void processObject(Mat src);
-void filterObjectsByArea(Mat* src, Vec3b backgroundColour, int areaTH);
+void filterObjectsByArea(Mat* src, Vec3b backgroundColour, int area_LOW, int area_HIGH);
 void filterObjectsByOrientation(Mat* src, Vec3b backgroundColour, float phi_LOW, float phi_HIGH);
 
 Mat_<int> labelBFS(Mat_<uchar> src, int objectPixel, int V = 1);
@@ -40,8 +40,17 @@ void binarizeLabelled(Mat_<uchar>& src, Mat_<Vec3b> labelledImg, Vec3b bg = Vec3
 
 
 //src = originalBinaryImage
-float getBinary2(Mat src, Mat labelledImg);
+//float getBinary2(Mat src, Mat labelledImg);
 void filterObjectsByAreaM(Mat* src, Vec3b backgroundColour, int area_HIGH);
+bool isLabelInVector(std::vector<Vec3b> labels, Vec3b label);
+typedef struct {
+	Vec3b label;
+	long double area = -1;
+	int perim = -1;
+	float orientationPhi = -1.0f;
+	float thinness = -1.0f;
+}ObjectData;
+ObjectData createObjectFromLabel(Mat* src, Vec3b originalPixelLabel);
 
 //Eroziune+Dilatare
 Mat_<uchar> dilate(Mat_<uchar> src, int n);
