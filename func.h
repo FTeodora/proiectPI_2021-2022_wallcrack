@@ -3,6 +3,8 @@
 int isInside(Mat img, int row, int col);
 void saveImage(Mat src, String fileName);
 
+Mat getBinary(Mat src);
+
 Mat_<uchar> getObjectFromImage(Mat src, Vec3b objectPixel);
 int calculateObjectArea(Mat src, Vec3b objectPixel);
 Point objectCenterOfMass(Mat src, Vec3b objectPixel, int objectArea);
@@ -35,6 +37,11 @@ Mat_<Vec3b> colourForLabels(Vec3b backgroundColour, Mat_<int> labels);
 void filterObjectsByThinness(Mat* src, Vec3b backgroundColour, float thinnessTH);
 
 void binarizeLabelled(Mat_<uchar>& src, Mat_<Vec3b> labelledImg, Vec3b bg = Vec3b(0, 0, 0));
+
+
+//src = originalBinaryImage
+float getBinary2(Mat src, Mat labelledImg);
+void filterObjectsByAreaM(Mat* src, Vec3b backgroundColour, int area_HIGH);
 
 //Eroziune+Dilatare
 Mat_<uchar> dilate(Mat_<uchar> src, int n);
